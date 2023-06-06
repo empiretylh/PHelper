@@ -1,0 +1,2 @@
+src/dist/Linux/main filter=lfs diff=lfs merge=lfs -text
+src/dist/Win/main.exe filter=lfs diff=lfs merge=lfs -text
