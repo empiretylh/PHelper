@@ -1,6 +1,7 @@
 import cv2
 import os
 import rembg
+import sys
 
 class RemoveBackground:
     def __init__(self, images, aspect_ratio, rgb, output_dir, bw=False):
@@ -54,6 +55,10 @@ class RemoveBackground:
 
             else:
                 print("Face not detected")
+                sys.stdout.flush()
 
             basename = os.path.basename(i[0])
             cv2.imwrite(os.path.join(self.output_dir, basename), crop_img)
+            print('o:'+os.path.join(self.output_dir, basename))
+            sys.stdout.flush()
+

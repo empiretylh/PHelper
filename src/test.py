@@ -36,6 +36,8 @@ while True:
 
 	if not images:
 		break
+	else:
+		images = images.replace('"','')
 
 	print("Import Qty")
 	qtys = getData()
@@ -103,9 +105,12 @@ while True:
 	a = RemoveBackground( combined_IMAGES,aspect_ratio,bg_rgb,img_output_di,bw)
 	a.remove()
 
+	print('msg:' + 'Finished Remove Background and Crop')
 
 	GeneratePhoto(paper_size,gap, combined_IMAGES,img_max_width,img_max_height,raw_export=img_output_di,paper_output_di=paper_output_di).export()
 
+	print('msg:' + "Finished Paper Layout")
 
 
-	print("Complete____Process ")
+	print("o:Completed")
+	sys.stdout.flush()

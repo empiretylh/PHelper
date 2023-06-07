@@ -2,7 +2,7 @@ from PIL import Image
 import math
 import os
 from datetime import datetime
-
+import sys
 class GeneratePhoto:
     def __init__(self, paper_size, gap, images, img_max_width, img_max_height, raw_export, paper_output_di):
         self.paper_size = paper_size
@@ -116,4 +116,5 @@ class GeneratePhoto:
             pathname = os.path.join(self.paper_output_di, "p_"+pn+"_" + date_time_string + '.jpg')
             a4_image.save(pathname)
 
-            print(pathname)
+            print('o:'+pathname)
+            sys.stdout.flush()
