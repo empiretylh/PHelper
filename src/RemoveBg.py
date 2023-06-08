@@ -1,12 +1,15 @@
 import cv2
-# import cvzone
-# from cvzone.SelfiSegmentationModule import SelfiSegmentation
 from PIL import Image
 import rembg
-# Load the input image
 import os
+import tempfile
 
-import subprocess
+def wmsg(msg):
+    temp_file_path = os.path.join(tempfile.gettempdir(), 'pascaltemp.txt')
+
+    # Write data to the temporary file
+    with open(temp_file_path, 'w') as temp_file:
+        temp_file.write(msg)
 
 class RemoveBackground():
 

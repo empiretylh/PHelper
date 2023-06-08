@@ -2,6 +2,20 @@ from PaperLayout import GeneratePhoto
 from Rbg import RemoveBackground
 import sys
 import os
+import tempfile
+from server import StartServer
+from server import send_message_to_clients
+
+#Start Python Server
+StartServer()
+
+def wmsg(msg):
+    temp_file_path = os.path.join(tempfile.gettempdir(), 'pascaltemp.txt')
+
+    # Write data to the temporary file
+    with open(temp_file_path, 'w') as temp_file:
+        temp_file.write(msg)
+		
 
 def createDirectory():
 	# Get the user's home directory
@@ -105,12 +119,12 @@ while True:
 	a = RemoveBackground( combined_IMAGES,aspect_ratio,bg_rgb,img_output_di,bw)
 	a.remove()
 
-	print('msg:' + 'Finished Remove Background and Crop')
+	wmsg('msg:' + 'Finished Remove Background and Crop')
 
 	GeneratePhoto(paper_size,gap, combined_IMAGES,img_max_width,img_max_height,raw_export=img_output_di,paper_output_di=paper_output_di).export()
 
-	print('msg:' + "Finished Paper Layout")
+	wmsg('msg:' + "Finished Paper Layout")
 
 
-	print("o:Completed")
+	wmsg("o:Completed")
 	sys.stdout.flush()

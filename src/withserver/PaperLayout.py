@@ -2,19 +2,9 @@ from PIL import Image
 import math
 import os
 from datetime import datetime
-import sys
-
-import tempfile
-
-def wmsg(msg):
-    temp_file_path = os.path.join(tempfile.gettempdir(), 'pascaltemp.txt')
-
-    # Write data to the temporary file
-    with open(temp_file_path, 'w') as temp_file:
-        temp_file.write(msg)
 
 class GeneratePhoto:
-    def __init__(self, paper_size, gap, images, img_max_width, img_max_height, raw_export, paper_output_di):
+    def __init__(self, paper_size, gap, images, img_max_width, img_max_height, raw_export, paper_output_di, server,client):
         self.paper_size = paper_size
         self.gap = gap
         self.images = images
@@ -22,6 +12,8 @@ class GeneratePhoto:
         self.img_max_height = img_max_height
         self.raw_export = raw_export
         self.paper_output_di = paper_output_di
+        self.server = server 
+        self.client = client   
         print(images)
 	
 	
@@ -125,6 +117,4 @@ class GeneratePhoto:
             pname += 1
             pathname = os.path.join(self.paper_output_di, "p_"+pn+"_" + date_time_string + '.jpg')
             a4_image.save(pathname)
-
-            wmsg('PAPER:'+pathname)
-           
+            self.server.send_message(self.client,"PAPER:"+pathname)

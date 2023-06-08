@@ -1,21 +1,10 @@
 import cv2
 import os
 import rembg
-import sys
-import tempfile
-
-def wmsg(msg):
-    temp_file_path = os.path.join(tempfile.gettempdir(), 'pascaltemp.txt')
-
-    # Write data to the temporary file
-    with open(temp_file_path, 'w') as temp_file:
-        temp_file.write(msg)
-
-    print(temp_file_path)
 
     
 class RemoveBackground:
-    def __init__(self, images, aspect_ratio, rgb, output_dir, bw=False):
+    def __init__(self, images, aspect_ratio, rgb, output_dir, bw=False,server='',client=''):
         self.images = images
         self.aspect_ratio = aspect_ratio
         self.rgb = rgb
@@ -24,6 +13,8 @@ class RemoveBackground:
         self.model_name = "silueta"
         self.session = rembg.new_session(model_name=self.model_name)
         self.face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+        self.server = server
+        self.client = client
 
         if self.face_cascade.empty():
             raise IOError('Unable to load the face cascade classifier xml file')
@@ -65,10 +56,13 @@ class RemoveBackground:
                 crop_img = img[crop_y:crop_y+crop_height+margin_y*2, crop_x:crop_x+crop_width+margin_x*2]
 
             else:
-                wmsg('Face Not Detected')
+               crop_img = imgread
+               print("Face not Detected") 
 
             basename = os.path.basename(i[0])
-            cv2.imwrite(os.path.join(self.output_dir, basename), crop_img)
-            wmsg('IMG:'+os.path.join(self.output_dir, basename))
+            path = os.path.join(self.output_dir,basename)
+            cv2.imwrite(path, crop_img)
+            self.server.send_message(self.client,"IMG:"+path)
+           
             
 

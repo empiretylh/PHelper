@@ -2,6 +2,17 @@ from PaperLayout import GeneratePhoto
 from Rbg import RemoveBackground
 import sys
 import os
+import tempfile
+
+def wmsg(msg):
+    temp_file_path = os.path.join(tempfile.gettempdir(), 'pascaltemp.txt')
+
+    # Write data to the temporary file
+    with open(temp_file_path, 'w') as temp_file:
+        temp_file.write(msg)
+
+
+sys.stdout.reconfigure(line_buffering=True)
 
 # images = {('img2.jpg',12)}
 # aspect_ratio = 1.1 / 1.3
