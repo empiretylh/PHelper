@@ -4,6 +4,7 @@ import sys
 import os
 
 from websocket_server import WebsocketServer
+from crop46 import CropBeauty
 import logging
 server = WebsocketServer(host='127.0.0.1', port=13254, loglevel=logging.INFO)
 
@@ -22,17 +23,24 @@ def create_directory():
     # Create the directory if it doesn't exist
     directory1 = os.path.join(documents_folder, "Pascal/img")
     directory2 = os.path.join(documents_folder, "Pascal/paper")
+    directory3 = os.path.join(documents_folder,"Pascal/beauty")
     
     os.makedirs(directory1, exist_ok=True)
     os.makedirs(directory2, exist_ok=True)
+    os.makedirs(directory3,exist_ok=True)
     print('Created Directory')
     
     return os.path.join(documents_folder, "Pascal")
 
 
+# Mode  mode has two mode beauty photo and passport photo 
+# Mark Passport for  (passport) (IMG)
+# Mark Beauty for (beauty) (BUTY)
+# fmode is only True and False
+
 def message_received(client,server, message):
-    global images, qtys, img_size, paper_size, bw, bg_color
-    print(message)
+    global images, qtys, img_size, paper_size, bw, bg_color,mode,fmode
+    mode = 'passport'
     if message.startswith("Images:"):
         images = message[7:]
     elif message.startswith("Qty:"):
@@ -48,6 +56,10 @@ def message_received(client,server, message):
     elif message.startswith("BgColor:"):
         bg_arg_color = message[8:]
         bg_color = tuple(int(x) for x in bg_arg_color.split(","))
+    elif message.startswith("Mode:"):
+        mode = message[5:]
+    elif message.startswith("FMode:"):
+        fmode = message[6:] == "true"
     elif message == "start_processing":
         # Process the data when the "StartProcessing" message is received
         print("Starting Processing")
@@ -55,6 +67,7 @@ def message_received(client,server, message):
         main_path = create_directory()
         img_output_di = os.path.join(main_path, 'img/')
         paper_output_di = os.path.join(main_path, 'paper/')
+        beauty_output_di = os.path.join(main_path,'beauty/')
         img_max_width = img_size[0] * 300
         img_max_height = img_size[1] * 300
         aspect_ratio = img_max_width / img_max_height
@@ -62,10 +75,16 @@ def message_received(client,server, message):
         bg_rgb = bg_color
 
         combined_IMAGES = [(filename, quantity) for filename, quantity in zip(images.split(","), qtys.split(","))]
+        if mode == 'passport':
+            a = RemoveBackground(combined_IMAGES, aspect_ratio, bg_rgb, img_output_di, bw,server=server,client=client)
+            a.remove()
+        elif mode == 'beauty':
+            beauty = CropBeauty(combined_IMAGES,aspect_ratio,beauty_output_di,fmode,server,client)
+            beauty.crop()
+        else:
+            a = RemoveBackground(combined_IMAGES, aspect_ratio, bg_rgb, img_output_di, bw,server=server,client=client)
+            a.remove()
 
-        # Call your functions to process the data
-        a = RemoveBackground(combined_IMAGES, aspect_ratio, bg_rgb, img_output_di, bw,server=server,client=client)
-        a.remove()
         GeneratePhoto(paper_size, gap, combined_IMAGES, img_max_width, img_max_height, raw_export=img_output_di, paper_output_di=paper_output_di,server=server,client=client).export()
         server.send_message(client,"Finished Generation")
         print("FInished Server Generation")
@@ -87,5 +106,3 @@ if __name__ == "__main__":
     server.set_fn_new_client(new_client)
     server.set_fn_message_received(message_received)
     server.run_forever()
-    
-    print("server started")
