@@ -40,9 +40,12 @@ def create_directory():
 
 def message_received(client,server, message):
     global images, qtys, img_size, paper_size, bw, bg_color,mode,fmode
-    mode = 'passport'
+    global combined_IMAGES,img_output_di,paper_output_di,beauty_output_di,img_max_width,img_max_height
+    global landscape
+  
     if message.startswith("Images:"):
         images = message[7:]
+        images = images.replace('"','')
     elif message.startswith("Qty:"):
         qtys = message[4:]
     elif message.startswith("ImgSize:"):
@@ -74,20 +77,58 @@ def message_received(client,server, message):
         gap = 50
         bg_rgb = bg_color
 
+
+
+        # Calculate the number of images that can fit in landscape orientation
+        num_images_landscape = (paper_size[0] // img_max_width) * (paper_size[1] // img_max_height)
+
+        # Calculate the number of images that can fit in portrait orientation
+        num_images_portrait = (paper_size[0] // img_max_height) * (paper_size[1] // img_max_width)
+
+        landscape = False 
+
+
+        print(num_images_landscape,num_images_portrait)
+
+        if num_images_portrait > num_images_landscape:
+            print("Need to Change Landscape")
+            landscape = True
+
         combined_IMAGES = [(filename, quantity) for filename, quantity in zip(images.split(","), qtys.split(","))]
         if mode == 'passport':
+            print("Generate Passport Photo")
             a = RemoveBackground(combined_IMAGES, aspect_ratio, bg_rgb, img_output_di, bw,server=server,client=client)
             a.remove()
         elif mode == 'beauty':
-            beauty = CropBeauty(combined_IMAGES,aspect_ratio,beauty_output_di,fmode,server,client)
+            print("Generate Beauty Photo")
+            beauty = CropBeauty(combined_IMAGES,aspect_ratio,beauty_output_di,fmode,landscape,server,client)
             beauty.crop()
+           
         else:
             a = RemoveBackground(combined_IMAGES, aspect_ratio, bg_rgb, img_output_di, bw,server=server,client=client)
             a.remove()
-
-        GeneratePhoto(paper_size, gap, combined_IMAGES, img_max_width, img_max_height, raw_export=img_output_di, paper_output_di=paper_output_di,server=server,client=client).export()
+           
+            GeneratePhoto(paper_size, gap, combined_IMAGES, img_max_width, img_max_height, raw_export=img_output_di, paper_output_di=paper_output_di,server=server,client=client).export()
+        
+           
         server.send_message(client,"Finished Generation")
-        print("FInished Server Generation")
+        print("Finished Server Generation")
+
+    elif message == "start_layout":
+        GeneratePhoto(paper_size, 25, combined_IMAGES, img_max_width, img_max_height, raw_export=beauty_output_di, paper_output_di=paper_output_di,server=server,client=client,landscape=landscape).export()
+
+    elif message.startswith("start_layout_di:"):
+        p_output_di = message[16:]
+        p_output_di = p_output_di.replace('"','')
+        GeneratePhoto(paper_size, 25, combined_IMAGES, img_max_width, img_max_height, raw_export=beauty_output_di, paper_output_di=p_output_di,server=server,client=client,landscape=landscape).export()
+   
+    elif message.startswith("start_layout_di_pdf:"):
+        p_output_di = message[21:]
+        p_output_di = p_output_di.replace('"','')
+        
+        GeneratePhoto(paper_size, 25, combined_IMAGES, img_max_width, img_max_height, raw_export=beauty_output_di, paper_output_di=p_output_di,server=server,client=client,landscape=landscape,pdfMode=True).export()
+              
+
 
 def new_client(client,server):
     print("New Client Connected")

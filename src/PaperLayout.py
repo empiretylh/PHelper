@@ -83,7 +83,7 @@ class GeneratePhoto:
 
         for p in count_set:
             a4_image = Image.new('RGB', paper_size, color='white')
-
+            a4_image.info['dpi'] = (300,300)
             # Get the current date and time
             date_time_string = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -98,7 +98,8 @@ class GeneratePhoto:
             img = Image.open(os.path.join(self.raw_export, os.path.basename(key_list[index])))
             # img.thumbnail((img_max_width, img_max_height), resample=Image.BICUBIC)
             img = img.resize((int(img_max_width),int(img_max_height)),resample=Image.BICUBIC) 
-
+            img.info['dpi'] = (300,300)
+            
             positions = []
             for a in range(imgs_sum):
                 x_pos = a % limited_img_xaxis
@@ -124,6 +125,7 @@ class GeneratePhoto:
 
             pname += 1
             pathname = os.path.join(self.paper_output_di, "p_"+pn+"_" + date_time_string + '.jpg')
+            print("Paper Info-----------------",a4_image.info['dpi'])
             a4_image.save(pathname)
 
             wmsg('PAPER:'+pathname)
