@@ -32,11 +32,12 @@ class RemoveBackground:
             else:
                 rgb = self.rgb
 
-            img = rembg.remove(imgread, bgcolor=rgb)
 
-            faces = self.face_cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=5)
+            faces = self.face_cascade.detectMultiScale(imgread, scaleFactor=1.1, minNeighbors=5)
 
             if len(faces) > 0:
+                img = rembg.remove(imgread, bgcolor=rgb)
+           
                 x, y, w, h = faces[0]
                 center_x = x + w // 2
                 center_y = y + h // 2

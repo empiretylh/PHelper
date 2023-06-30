@@ -115,7 +115,13 @@ def message_received(client,server, message):
         print("Finished Server Generation")
 
     elif message == "start_layout":
-        GeneratePhoto(paper_size, 25, combined_IMAGES, img_max_width, img_max_height, raw_export=beauty_output_di, paper_output_di=paper_output_di,server=server,client=client,landscape=landscape).export()
+        if mode == "passport":
+            GeneratePhoto(paper_size, 25, combined_IMAGES, img_max_width, img_max_height, raw_export=img_output_di, paper_output_di=paper_output_di,server=server,client=client).export()
+        elif mode == "beauty":
+            GeneratePhoto(paper_size, 25, combined_IMAGES, img_max_width, img_max_height, raw_export=beauty_output_di, paper_output_di=paper_output_di,server=server,client=client,landscape=landscape).export()
+        else:
+            GeneratePhoto(paper_size, 25, combined_IMAGES, img_max_width, img_max_height, raw_export=beauty_output_di, paper_output_di=paper_output_di,server=server,client=client,landscape=landscape).export()
+     
 
     elif message.startswith("start_layout_di:"):
         p_output_di = message[16:]
