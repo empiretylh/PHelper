@@ -129,7 +129,11 @@ def message_received(client,server, message):
         GeneratePhoto(paper_size, 25, combined_IMAGES, img_max_width, img_max_height, raw_export=beauty_output_di, paper_output_di=p_output_di,server=server,client=client,landscape=landscape).export()
    
     elif message.startswith("start_layout_di_pdf:"):
-        p_output_di = message[21:]
+        if os.name == "posix":  # Linux or macOS
+            p_output_di = message[21:]
+        elif os.name == "nt":  # Windows
+            p_output_di = message[22:]
+
         p_output_di = p_output_di.replace('"','')
         
         GeneratePhoto(paper_size, 25, combined_IMAGES, img_max_width, img_max_height, raw_export=beauty_output_di, paper_output_di=p_output_di,server=server,client=client,landscape=landscape,pdfMode=True).export()
