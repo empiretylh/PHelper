@@ -146,14 +146,16 @@ class GeneratePhoto:
             self.server.send_message(self.client,"processing_pdf")
             pathname = self.paper_output_di
             print(pathname,"Path Name :::")
-            file_path_raw = pathname.replace("\\", "\\\\")
+            file_path_raw = os.path.join(pathname)
             
-            if file_path_raw.startswith("/"):
+            if os.name == 'posix':
+                if file_path_raw.startswith('/'):
+                    CreatePDF(file_path_raw,self.paper_size, paperList)
+                else:
+                    CreatePDF("/"+file_path_raw,self.paper_size,paperList)
+            elif os.name == "nt":
                 CreatePDF(file_path_raw,self.paper_size,paperList)
-            else:
-                CreatePDF("/"+file_path_raw,self.paper_size,paperList)
-
-
+                
             print("COMBINING PDF COMPLETED")
             self.server.send_message(self.client,"PDF:"+pathname)
 
